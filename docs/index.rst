@@ -7,7 +7,7 @@ Welcome to |project| documentation!
    history
 
 
-.. automodule:: skeleton
+.. automodule:: keyrings.firefox
     :members:
     :undoc-members:
     :show-inheritance:
