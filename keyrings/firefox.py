@@ -7,7 +7,6 @@ import hashlib
 import base64
 import uuid
 import contextlib
-import binascii
 
 from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
 from cryptography.hazmat.primitives import padding
@@ -60,13 +59,20 @@ class Client:
         client = fxa.core.Client()
         email = input('Firefox email: ')
         password = getpass.getpass('Firefox password: ')
+        # TODO: Need to get a real client id, but how?
+        client_id = 'keyrings.firefox'
         with closing(client.login(email, password, keys=True)) as session:
             check_verified(session)
-            self.assertion = session.get_identity_assertion(
-                "https://token.services.mozilla.com/"
-            )
+            self.access_token, self.refresh_token = \
+                syncclient.client.create_oauth_token(session, client_id)
             _, self.kB = session.fetch_keys()
+            self.client = syncclient.client.get_sync_client(
+                session, client_id, self.access_token)
         self._build_keys()
+
+    @property
+    def access_token(self):
+        return self.t
 
     def _build_keys(self):
         raw_sync_key = fxa.crypto.derive_key(self.kB, "oldsync", 64)
@@ -80,11 +86,6 @@ class Client:
             base64.b64decode(keys["default"][0]),
             base64.b64decode(keys["default"][1]),
         )
-
-    @property
-    def client(self):
-        xcs = binascii.hexlify(hashlib.sha256(self.kB).digest()[:16])
-        return syncclient.client.SyncClient(self.assertion, xcs)
 
     def encrypt(self, record):
         encrypted = self.default_key_bundle.encrypt_bso(record)
