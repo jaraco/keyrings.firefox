@@ -59,8 +59,8 @@ class Client:
         client = fxa.core.Client()
         email = input('Firefox email: ')
         password = getpass.getpass('Firefox password: ')
-        # TODO: Need to get a real client id, but how?
-        client_id = 'keyrings.firefox'
+        # TODO: This client id is borrowed from Firefox itself; get a unique one
+        client_id = 'ea3ca969f8c6bb0d'
         with closing(client.login(email, password, keys=True)) as session:
             check_verified(session)
             self.access_token, self.refresh_token = \
@@ -69,10 +69,6 @@ class Client:
             self.client = syncclient.client.get_sync_client(
                 session, client_id, self.access_token)
         self._build_keys()
-
-    @property
-    def access_token(self):
-        return self.t
 
     def _build_keys(self):
         raw_sync_key = fxa.crypto.derive_key(self.kB, "oldsync", 64)
