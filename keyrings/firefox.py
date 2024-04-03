@@ -63,11 +63,13 @@ class Client:
         client_id = 'ea3ca969f8c6bb0d'
         with closing(client.login(email, password, keys=True)) as session:
             check_verified(session)
-            self.access_token, self.refresh_token = \
+            self.access_token, self.refresh_token = (
                 syncclient.client.create_oauth_token(session, client_id)
+            )
             _, self.kB = session.fetch_keys()
             self.client = syncclient.client.get_sync_client(
-                session, client_id, self.access_token)
+                session, client_id, self.access_token
+            )
         self._build_keys()
 
     def _build_keys(self):
@@ -151,11 +153,9 @@ class KeyBundle:
 
         return {
             "id": data["id"],
-            "payload": json.dumps(
-                {
-                    "ciphertext": b64_ciphertext,
-                    "IV": base64.b64encode(iv),
-                    "hmac": mac,
-                }
-            ),
+            "payload": json.dumps({
+                "ciphertext": b64_ciphertext,
+                "IV": base64.b64encode(iv),
+                "hmac": mac,
+            }),
         }
