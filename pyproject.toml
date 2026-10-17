@@ -25,6 +25,8 @@ license = "MIT"
 dependencies = [
 	"PyFxA",
 	"syncclient@git+https://github.com/eNote-GmbH/syncclient",
+	# required by syncclient but no longer supplied by PyFxA
+	"PyBrowserID",
 	"cryptography",
 	# required by PyFxA
 	"setuptools",
