@@ -1,20 +1,19 @@
+import base64
+import contextlib
+import getpass
+import hashlib
+import hmac
+import json
 import os
 import time
-import json
-import getpass
-import hmac
-import hashlib
-import base64
 import uuid
-import contextlib
 
-from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
-from cryptography.hazmat.primitives import padding
-from cryptography.hazmat.backends import default_backend
 import fxa.core
 import fxa.crypto
 import syncclient.client
-
+from cryptography.hazmat.backends import default_backend
+from cryptography.hazmat.primitives import padding
+from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
 
 CRYPTO_BACKEND = default_backend()
 
@@ -114,7 +113,7 @@ class KeyBundle:
         mac = hmac.new(self.mac_key, payload["ciphertext"], hashlib.sha256)
         if mac.hexdigest() != payload["hmac"]:
             raise ValueError(
-                "hmac mismatch: %r != %r" % (mac.hexdigest(), payload["hmac"])
+                f"hmac mismatch: {mac.hexdigest()!r} != {payload['hmac']!r}"
             )
 
         iv = base64.b64decode(payload["IV"])
